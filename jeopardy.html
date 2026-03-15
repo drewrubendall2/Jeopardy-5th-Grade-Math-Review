@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>5th Grade End of Module Review Jeopardy</title>
+  <style>
+    :root{
+      --bg1:#0f172a;
+      --bg2:#1e293b;
+      --panel:#ffffff;
+      --accent:#fbbf24;
+      --accent2:#2563eb;
+      --text:#0f172a;
+      --light:#f8fafc;
+      --muted:#cbd5e1;
+      --good:#16a34a;
+      --bad:#dc2626;
+      --shadow:0 12px 30px rgba(0,0,0,.22);
+      --radius:18px;
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      color: white;
+      min-height:100vh;
+    }
+
+    .container{
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .header{
+      text-align:center;
+      margin-bottom: 22px;
+    }
+
+    .header h1{
+      margin:0;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      letter-spacing:.5px;
+      color: #fff;
+    }
+
+    .header p{
+      margin:10px 0 0;
+      color: var(--muted);
+      font-size:1.05rem;
+    }
+
+    .top-bar{
+      display:grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap:18px;
+      margin-bottom:22px;
+    }
+
+    .panel{
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius);
+      padding:18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .team-grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:14px;
+    }
+
+    .team-card{
+      background: rgba(255,255,255,.1);
+      border-radius:16px;
+      padding:14px;
+      text-align:center;
+      border:1px solid rgba(255,255,255,.12);
+    }
+
+    .team-card input{
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:none;
+      outline:none;
+      font-size:1rem;
+      text-align:center;
+      margin-bottom:10px;
+    }
+
+    .score{
+      font-size:2rem;
+      font-weight:700;
+      margin-bottom:10px;
+      color: var(--accent);
+    }
+
+    .score-controls{
+      display:flex;
+      gap:8px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+
+    button{
+      border:none;
+      border-radius:10px;
+      padding:10px 14px;
+      cursor:pointer;
+      font-weight:600;
+      transition: transform .15s ease, opacity .15s ease;
+    }
+
+    button:hover{
+      transform: translateY(-1px);
+    }
+
+    button:disabled{
+      cursor:not-allowed;
+      opacity:.55;
+      transform:none;
+    }
+
+    .btn-primary{
+      background: var(--accent2);
+      color:white;
+    }
+
+    .btn-gold{
+      background: var(--accent);
+      color:#111827;
+    }
+
+    .btn-light{
+      background: #e2e8f0;
+      color:#0f172a;
+    }
+
+    .btn-good{
+      background: var(--good);
+      color:white;
+    }
+
+    .btn-bad{
+      background: var(--bad);
+      color:white;
+    }
+
+    .controls{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      justify-content:center;
+      height:100%;
+    }
+
+    .controls h3{
+      margin:0 0 6px 0;
+      color:white;
+    }
+
+    .controls p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.4;
+    }
+
+    .controls-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:8px;
+    }
+
+    .board{
+      display:grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap:12px;
+    }
+
+    .category{
+      background: rgba(255,255,255,.08);
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+    }
+
+    .category-title{
+      background: linear-gradient(180deg, #1d4ed8, #1e40af);
+      color:white;
+      text-align:center;
+      font-weight:800;
+      padding:16px 10px;
+      min-height:88px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1rem;
+      line-height:1.2;
+      text-transform:uppercase;
+      letter-spacing:.4px;
+    }
+
+    .tile{
+      width:100%;
+      min-height:92px;
+      border:none;
+      border-top:1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, #2563eb, #1d4ed8);
+      color: var(--accent);
+      font-size:1.8rem;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .tile:hover{
+      filter:brightness(1.08);
+    }
+
+    .tile.used{
+      background: #334155;
+      color:#94a3b8;
+      cursor:not-allowed;
+    }
+
+    .modal{
+      position:fixed;
+      inset:0;
+      background: rgba(2,6,23,.72);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      z-index:999;
+    }
+
+    .modal.show{
+      display:flex;
+    }
+
+    .modal-card{
+      width:min(900px, 100%);
+      background: var(--panel);
+      color: var(--text);
+      border-radius:24px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .modal-header{
+      background: linear-gradient(135deg, #1d4ed8, #2563eb);
+      color:white;
+      padding:18px 22px;
+    }
+
+    .modal-header h2{
+      margin:0;
+      font-size:1.5rem;
+    }
+
+    .modal-body{
+      padding:24px;
+    }
+
+    .question-text{
+      font-size:1.45rem;
+      line-height:1.5;
+      font-weight:600;
+      margin-bottom:20px;
+    }
+
+    .answer-box{
+      display:none;
+      background:#eff6ff;
+      border:2px solid #bfdbfe;
+      border-radius:16px;
+      padding:18px;
+      margin-bottom:22px;
+    }
+
+    .answer-box.show{
+      display:block;
+    }
+
+    .answer-box h3{
+      margin:0 0 8px 0;
+      color:#1d4ed8;
+    }
+
+    .answer-box p{
+      margin:0;
+      font-size:1.08rem;
+      line-height:1.5;
+    }
+
+    .modal-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    .team-award{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .team-award span{
+      font-weight:700;
+      color:#334155;
+      margin-right:2px;
+    }
+
+    .footer-note{
+      margin-top:18px;
+      color:#cbd5e1;
+      text-align:center;
+      font-size:.95rem;
+    }
+
+    @media (max-width: 1100px){
+      .top-bar{
+        grid-template-columns:1fr;
+      }
+
+      .board{
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 700px){
+      .team-grid{
+        grid-template-columns:1fr;
+      }
+
+      .board{
+        grid-template-columns:1fr;
+      }
+
+      .question-text{
+        font-size:1.15rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>End of Module Review Jeopardy</h1>
+      <p>5th Grade Math Review Game</p>
+    </div>
+
+    <div class="top-bar">
+      <div class="panel">
+        <h3 style="margin-top:0;">Team Scoreboard</h3>
+        <div class="team-grid" id="teamGrid"></div>
+      </div>
+
+      <div class="panel controls">
+        <div>
+          <h3>Game Controls</h3>
+          <p>Click a point value to open a question. Reveal the answer, then award or subtract points for a team.</p>
+        </div>
+        <div class="controls-row">
+          <button class="btn-gold" onclick="resetBoard()">Reset Board</button>
+          <button class="btn-light" onclick="resetScores()">Reset Scores</button>
+          <button class="btn-primary" onclick="expandAll()">Show All Questions Used</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="board" id="board"></div>
+
+    <div class="footer-note">
+      Designed as a clean, interactive classroom review game.
+    </div>
+  </div>
+
+  <div class="modal" id="questionModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="modalTitle">Question</h2>
+      </div>
+      <div class="modal-body">
+        <div class="question-text" id="modalQuestion"></div>
+
+        <div class="answer-box" id="answerBox">
+          <h3>Answer</h3>
+          <p id="modalAnswer"></p>
+        </div>
+
+        <div class="modal-actions">
+          <div class="controls-row">
+            <button class="btn-primary" id="revealBtn" onclick="revealAnswer()">Reveal Answer</button>
+            <button class="btn-light" onclick="closeModal()">Close</button>
+          </div>
+
+          <div class="team-award">
+            <span>Award/Subtract:</span>
+            <button class="btn-good" onclick="changeScore(0, currentQuestion.value)">Team 1 +</button>
+            <button class="btn-good" onclick="changeScore(1, currentQuestion.value)">Team 2 +</button>
+            <button class="btn-good" onclick="changeScore(2, currentQuestion.value)">Team 3 +</button>
+            <button class="btn-bad" onclick="changeScore(0, -currentQuestion.value)">Team 1 -</button>
+            <button class="btn-bad" onclick="changeScore(1, -currentQuestion.value)">Team 2 -</button>
+            <button class="btn-bad" onclick="changeScore(2, -currentQuestion.value)">Team 3 -</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const teams = [
+      { name: "Team 1", score: 0 },
+      { name: "Team 2", score: 0 },
+      { name: "Team 3", score: 0 }
+    ];
+
+    const categories = [
+      {
+        title: "Multiply & Divide Fractions",
+        questions: [
+          {
+            value: 100,
+            q: "Compute: 1/3 × 1/5",
+            a: "1/15"
+          },
+          {
+            value: 200,
+            q: "Compute: 3/4 × 2/5",
+            a: "6/20, which simplifies to 3/10"
+          },
+          {
+            value: 300,
+            q: "Compute: 1/4 ÷ 5",
+            a: "1/20"
+          },
+          {
+            value: 400,
+            q: "Compute: 8 ÷ 1/3",
+            a: "24"
+          }
+        ]
+      },
+      {
+        title: "Write Equivalent Expressions",
+        questions: [
+          {
+            value: 100,
+            q: "Write an expression for: One-half the sum of one-half and one-third.",
+            a: "1/2 × (1/2 + 1/3)"
+          },
+          {
+            value: 200,
+            q: "Write an expression for: Two and one-third times the sum of nine and twelve.",
+            a: "2 1/3 × (9 + 12)"
+          },
+          {
+            value: 300,
+            q: "Write an expression for: Twelve divided by the difference between 1 1/2 and 3/4.",
+            a: "12 ÷ (1 1/2 - 3/4)"
+          },
+          {
+            value: 400,
+            q: "Compute: 1.2 ÷ 0.3",
+            a: "4"
+          }
+        ]
+      },
+      {
+        title: "Guard Duty Time Problems",
+        questions: [
+          {
+            value: 100,
+            q: "Seven knights share 24 hours of guard duty equally. How many hours does each knight work? Round to the nearest tenth.",
+            a: "24 ÷ 7 = about 3.4 hours"
+          },
+          {
+            value: 200,
+            q: "Using the same guard duty problem, write the answer in hours and minutes.",
+            a: "3 hours 24 minutes"
+          },
+          {
+            value: 300,
+            q: "Using the same guard duty problem, write the answer in minutes.",
+            a: "204 minutes"
+          },
+          {
+            value: 400,
+            q: "Explain why 0.4 of an hour is 24 minutes.",
+            a: "Because 0.4 × 60 = 24, so 0.4 hour = 24 minutes."
+          }
+        ]
+      },
+      {
+        title: "Reasoning With Division",
+        questions: [
+          {
+            value: 100,
+            q: "Solve: 7 ÷ 2",
+            a: "3 1/2"
+          },
+          {
+            value: 200,
+            q: "Solve: 7 ÷ 1/2",
+            a: "14"
+          },
+          {
+            value: 300,
+            q: "Could either problem also be solved by using 1/2 × 7? If so, which one?",
+            a: "Yes. 7 ÷ 2 can be thought of as taking 1/2 of 7, so 1/2 × 7 = 3 1/2."
+          },
+          {
+            value: 400,
+            q: "A student says multiplication always makes a number bigger. Give a counterexample.",
+            a: "Example: 1/2 × 1/3 = 1/6. This shows multiplication can make a number smaller."
+          }
+        ]
+      },
+      {
+        title: "Jill's Honey Problems",
+        questions: [
+          {
+            value: 100,
+            q: "Jill collected 19 gallons of honey and distributed it equally between 7 jars. How much honey is in each jar?",
+            a: "19 ÷ 7 = 19/7 = 2 5/7 gallons per jar"
+          },
+          {
+            value: 200,
+            q: "Jill used 3/5 of a jar of honey for baking. How much honey did she use?",
+            a: "3/5 × 19/7 = 57/35 = 1 22/35 gallons"
+          },
+          {
+            value: 300,
+            q: "Jill's mom used 1/4 of a gallon of honey to bake 3 loaves of bread equally. How much honey was used for 1 loaf?",
+            a: "1/4 ÷ 3 = 1/12 gallon per loaf"
+          },
+          {
+            value: 400,
+            q: "A container held 3/4 gallon of honey. Half of this amount was used to sweeten tea. How much honey was used, in cups?",
+            a: "1/2 × 3/4 = 3/8 gallon. Since 1 gallon = 16 cups, 3/8 × 16 = 6 cups."
+          }
+        ]
+      }
+    ];
+
+    const boardEl = document.getElementById("board");
+    const teamGridEl = document.getElementById("teamGrid");
+    const modal = document.getElementById("questionModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalQuestion = document.getElementById("modalQuestion");
+    const modalAnswer = document.getElementById("modalAnswer");
+    const answerBox = document.getElementById("answerBox");
+    const revealBtn = document.getElementById("revealBtn");
+
+    let currentQuestion = null;
+
+    function renderTeams(){
+      teamGridEl.innerHTML = "";
+      teams.forEach((team, index) => {
+        const card = document.createElement("div");
+        card.className = "team-card";
+
+        card.innerHTML = `
+          <input value="${team.name}" onchange="updateTeamName(${index}, this.value)" />
+          <div class="score">${team.score}</div>
+          <div class="score-controls">
+            <button class="btn-good" onclick="changeScore(${index}, 100)">+100</button>
+            <button class="btn-bad" onclick="changeScore(${index}, -100)">-100</button>
+          </div>
+        `;
+        teamGridEl.appendChild(card);
+      });
+    }
+
+    function renderBoard(){
+      boardEl.innerHTML = "";
+      categories.forEach((category, catIndex) => {
+        const col = document.createElement("div");
+        col.className = "category";
+
+        const title = document.createElement("div");
+        title.className = "category-title";
+        title.textContent = category.title;
+        col.appendChild(title);
+
+        category.questions.forEach((question, qIndex) => {
+          const btn = document.createElement("button");
+          btn.className = "tile" + (question.used ? " used" : "");
+          btn.textContent = question.used ? "" : `$${question.value}`;
+          btn.disabled = !!question.used;
+          btn.onclick = () => openQuestion(catIndex, qIndex);
+          col.appendChild(btn);
+        });
+
+        boardEl.appendChild(col);
+      });
+    }
+
+    function updateTeamName(index, value){
+      teams[index].name = value.trim() || `Team ${index + 1}`;
+      renderTeams();
+    }
+
+    function openQuestion(catIndex, qIndex){
+      const question = categories[catIndex].questions[qIndex];
+      currentQuestion = {
+        ...question,
+        catIndex,
+        qIndex
+      };
+
+      modalTitle.textContent = `${categories[catIndex].title} - $${question.value}`;
+      modalQuestion.textContent = question.q;
+      modalAnswer.textContent = question.a;
+      answerBox.classList.remove("show");
+      revealBtn.style.display = "inline-block";
+      modal.classList.add("show");
+    }
+
+    function revealAnswer(){
+      answerBox.classList.add("show");
+      revealBtn.style.display = "none";
+
+      if (currentQuestion) {
+        categories[currentQuestion.catIndex].questions[currentQuestion.qIndex].used = true;
+        renderBoard();
+      }
+    }
+
+    function closeModal(){
+      modal.classList.remove("show");
+      currentQuestion = null;
+    }
+
+    function changeScore(teamIndex, amount){
+      teams[teamIndex].score += amount;
+      renderTeams();
+    }
+
+    function resetScores(){
+      teams.forEach(team => team.score = 0);
+      renderTeams();
+    }
+
+    function resetBoard(){
+      categories.forEach(category => {
+        category.questions.forEach(question => question.used = false);
+      });
+      renderBoard();
+      closeModal();
+    }
+
+    function expandAll(){
+      categories.forEach(category => {
+        category.questions.forEach(question => question.used = true);
+      });
+      renderBoard();
+      closeModal();
+    }
+
+    window.onclick = function(event){
+      if(event.target === modal){
+        closeModal();
+      }
+    };
+
+    renderTeams();
+    renderBoard();
+  </script>
+</body>
+</html>
